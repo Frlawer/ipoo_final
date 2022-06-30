@@ -5,8 +5,8 @@ class Viaje
     private $vdestino;
     private $vcantmaxpasajeros;
     private $rdocumento;
-    private $idempresa;
-    private $rnumeroempleado;
+    private $objEmpresa;
+    private $objResponsable;
     private $vimporte;
     private $tipoAsiento;
     private $idayvuelta;
@@ -15,14 +15,14 @@ class Viaje
 
     /** ###################'Funciones'#################### */
 
-    public function cargar($idviaje, $vdestino, $vcantmaxpasajeros, $rdocumento, $idempresa, $rnumeroempleado, $vimporte, $tipoAsiento, $idayvuelta)
+    public function cargar($idviaje, $vdestino, $vcantmaxpasajeros, $rdocumento, $objEmpresa, $objResponsable, $vimporte, $tipoAsiento, $idayvuelta)
     {
         $this->setIdviaje($idviaje);
         $this->setVdestino($vdestino);
         $this->setVcantmaxpasajeros($vcantmaxpasajeros);
         $this->setRdocumento($rdocumento);
-        $this->setIdempresa($idempresa);
-        $this->setRnumeroempleado($rnumeroempleado);
+        $this->setObjEmpresa($objEmpresa);
+        $this->setObjResponsable($objResponsable);
         $this->setVimporte($vimporte);
         $this->setTipoAsiento($tipoAsiento);
         $this->setIdayvuelta($idayvuelta);
@@ -45,8 +45,8 @@ class Viaje
                 '" . $this->getVdestino() . "',
                 '" . $this->getVcantmaxpasajeros() . "',
                 '" . $this->getRdocumento() . "',
-                '" . $this->getIdempresa() . "',
-                '" . $this->getRnumeroempleado() . "',
+                '" . $this->getObjEmpresa()->getIdempresa() . "',
+                '" . $this->getObjResponsable()->getRnumeroempleado() . "',
                 '" . $this->getVimporte() . "',
                 '" . $this->getTipoAsiento() . "',
                 '" . $this->getIdayvuelta() . "'
@@ -84,7 +84,7 @@ class Viaje
 
                     $idviaje = $row2['idviaje'];
                     $vdestino = $row2['vdestino'];
-                    $vcantidadmaxpasajeros = $row2['vcantidadmaxpasajeros'];
+                    $vcantmaxpasajeros = $row2['vcantmaxpasajeros'];
                     $rdocumento = $row2['rdocumento'];
                     $idempresa = $row2['idempresa'];
                     $rnumeroempleado = $row2['rnumeroempleado'];
@@ -93,7 +93,7 @@ class Viaje
                     $idayvuelta = $row2['idayvuelta'];
 
                     $pasajero = new Viaje();
-                    $pasajero->cargar($idviaje, $vdestino, $vcantidadmaxpasajeros, $rdocumento, $idempresa, $rnumeroempleado, $vimporte, $tipoAsiento, $idayvuelta);
+                    $pasajero->cargar($idviaje, $vdestino, $vcantmaxpasajeros, $rdocumento, $idempresa, $rnumeroempleado, $vimporte, $tipoAsiento, $idayvuelta);
                     array_push($arregloViaje, $pasajero);
                 }
             } else {
@@ -105,21 +105,21 @@ class Viaje
         return $arregloViaje;
     }
 
-    public function modificar()
+    public function modificar($idViaje)
     {
         $resp = false;
         $base = new BaseDatos();
         $consultaModifica = "UPDATE viaje SET 
-        idviaje = '" . $this->getIdviaje() . "',
+        idviaje = " . $this->getIdviaje() . ",
         vdestino = '" . $this->getVdestino() . "',
-        vcantmaxpasajeros = '" . $this->getVcantmaxpasajeros() . "',
+        vcantmaxpasajeros = " . $this->getVcantmaxpasajeros() . ",
         rdocumento = '" . $this->getRdocumento() . "',
-        idempresa = '" . $this->getIdempresa() . "',
-        rnumeroempleado = '" . $this->getRnumeroempleado() . "',
-        vimporte = '" . $this->getVimporte() . "',
-        tipoAsiento = '" . $this->getTipoAsiento() . "',
-        idayvuelta = '" . $this->getIdayvuelta() . "',
-        WHERE idviaje = " . $this->getIdviaje();
+        idempresa = " . $this->getObjEmpresa()->getIdempresa() . ",
+        rnumeroempleado = " . $this->getObjResponsable()->getRnumeroempleado() . ",
+        vimporte = " . $this->getVimporte() . ",
+        tipoAsiento = " . $this->getTipoAsiento() . ",
+        idayvuelta = " . $this->getIdayvuelta() . "
+        WHERE idviaje = " . $idViaje;
 
         if ($base->Iniciar()) {
             if ($base->Ejecutar($consultaModifica)) {
@@ -160,12 +160,17 @@ class Viaje
         if ($base->Iniciar()) {
             if ($base->Ejecutar($consultaviaje)) {
                 if ($row2 = $base->Registro()) {
+                    $responsable = new ResponsableV();
+                    $responsable->Buscar($row2['rnumeroempleado']);
+                    $empresa = new Empresa();
+                    $empresa->Buscar($row2['idempresa']);
+
                     $this->setIdviaje($row2["idviaje"]);
                     $this->setVdestino($row2['vdestino']);
                     $this->setVcantmaxpasajeros($row2['vcantmaxpasajeros']);
                     $this->setRdocumento($row2['rdocumento']);
-                    $this->setIdempresa($row2['idempresa']);
-                    $this->setRnumeroempleado($row2['rnumeroempleado']);
+                    $this->setObjEmpresa($empresa);
+                    $this->setObjResponsable($responsable);
                     $this->setVimporte($row2['vimporte']);
                     $this->setTipoAsiento($row2['tipoAsiento']);
                     $this->setIdayvuelta($row2['idayvuelta']);
@@ -186,8 +191,8 @@ class Viaje
         $this->setVdestino("");
         $this->setVcantmaxpasajeros("");
         $this->setRdocumento("");
-        $this->setIdempresa("");
-        $this->setRnumeroempleado("");
+        $this->setObjEmpresa("");
+        $this->setObjResponsable("");
         $this->setVimporte("");
         $this->setTipoAsiento("");
         $this->setIdayvuelta("");
@@ -200,9 +205,8 @@ class Viaje
         $string = "ID: " . $this->getIdviaje() . "\n";
         $string .= "Destino: " . $this->getVdestino() . "\n";
         $string .= "Cantidad Maxima de Pasajeros: " . $this->getVcantmaxpasajeros() . "\n";
-        $string .= "Responsable: " . $this->getRdocumento() . "\n";
-        $string .= "ID Empresa: "  . $this->getIdempresa() . "\n";
-        $string .= "Numero del Empleado: " . $this->getRnumeroempleado() . "\n";
+        $string .= "- Empresa: \n"  . $this->getObjEmpresa()->__toString() . "\n";
+        $string .= "- Responsable: \n" . $this->getObjResponsable()->__toString() . "\n";
         $string .= "Importe: " . $this->getVimporte() . "\n";
         $string .= "Tipo de Asiento: " . $this->getTipoAsiento() . "\n";
         $string .= "Ida y Vuelta: " . $this->getIdayvuelta() . "\n";
@@ -408,6 +412,46 @@ class Viaje
     public function setMensajeOperacion($mensajeOperacion)
     {
         $this->mensajeOperacion = $mensajeOperacion;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of objEmpresa
+     */
+    public function getObjEmpresa()
+    {
+        return $this->objEmpresa;
+    }
+
+    /**
+     * Set the value of objEmpresa
+     *
+     * @return  self
+     */
+    public function setObjEmpresa($objEmpresa)
+    {
+        $this->objEmpresa = $objEmpresa;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of objResponsable
+     */
+    public function getObjResponsable()
+    {
+        return $this->objResponsable;
+    }
+
+    /**
+     * Set the value of objResponsable
+     *
+     * @return  self
+     */
+    public function setObjResponsable($objResponsable)
+    {
+        $this->objResponsable = $objResponsable;
 
         return $this;
     }

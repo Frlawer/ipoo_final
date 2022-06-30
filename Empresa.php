@@ -159,9 +159,9 @@ class Empresa
 
     public function __toString()
     {
-        $string = "ID Empresa: " . $this->getIdEmpresa() . "\n";
-        $string .= "Nombre Empresa: " . $this->getENombre() . "\n";
-        $string .= "Direccion Empresa: " . $this->getEDireccion() . "\n";
+        $string = " ID Empresa: " . $this->getIdEmpresa() . "\n";
+        $string .= " Nombre Empresa: " . $this->getENombre() . "\n";
+        $string .= " Direccion Empresa: " . $this->getEDireccion() . "\n";
 
         return $string;
     }

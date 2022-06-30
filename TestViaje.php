@@ -23,7 +23,8 @@ function menuInicial()
         "Modificar Viaje",
         "Eliminar Viaje",
         "Mostrar datos del Viaje",
-        "Administrar pasajeros"
+        "Administrar pasajeros",
+        "X Salir"
     ];
     // imprimo el menu con bucle
     echo "Selecciona una opción del Menú: \n";
@@ -31,7 +32,7 @@ function menuInicial()
         echo $key + 1 . ") " . $value . "\n";
     }
     // llamo a la funcion solicitarNumero() para solicitar un numero y lo retorno.
-    $opcion = solicitarNumero(1, 5);
+    $opcion = solicitarNumero(1, 6);
     return $opcion;
 }
 
@@ -41,7 +42,8 @@ function menuPasajero()
         "Ingresar Pasajero",
         "Modificar Pasajero",
         "Eliminar Pasajero",
-        "Mostrar Pasajeros del Viaje"
+        "Mostrar Pasajeros del Viaje",
+        "<-- Regresar"
     ];
     // imprimo el menu con bucle
     echo "Selecciona una opción del Menú: \n";
@@ -49,7 +51,7 @@ function menuPasajero()
         echo $key + 1 . ") " . $value . "\n";
     }
     // llamo a la funcion solicitarNumero() para solicitar un numero y lo retorno.
-    $opcion = solicitarNumero(1, 4);
+    $opcion = solicitarNumero(1, 5);
     return $opcion;
 }
 function solicitarNumero($min, $max)
@@ -104,7 +106,7 @@ function iniciarResponsable($responsable)
             $nempleado = trim(fgets(STDIN));
             $responsableBD = $responsable->Buscar($nempleado);
         }
-        echo "\n...Empleado seleccionado... \n";
+        echo "\n...Responsable seleccionado... \n";
     } else {
         $datos = cargarResponsable();
 
@@ -133,11 +135,11 @@ function iniciarResponsable($responsable)
 function cargarResponsable()
 {
     $datosResponsable = [];
-    echo "Ingrese número de licencia: ";
+    echo "Ingrese número de licencia: \n";
     $datosResponsable["rnumerolicencia"] = trim(fgets(STDIN));
-    echo "Ingrese nombre del empleado: ";
+    echo "Ingrese nombre del empleado: \n";
     $datosResponsable["rnombre"] = trim(fgets(STDIN));
-    echo "Ingrese apellido del empleado: ";
+    echo "Ingrese apellido del empleado: \n";
     $datosResponsable["rapellido"] = trim(fgets(STDIN));
 
     return $datosResponsable;
@@ -146,15 +148,15 @@ function cargarResponsable()
 function datosViaje()
 {
     $datos = [];
-    echo 'Ingrese destino: ';
+    echo "Ingrese destino: \n";
     $datos["vdestino"] = trim(fgets(STDIN));
-    echo 'Capacidad maxima de pasajeros: ';
+    echo "Capacidad maxima de pasajeros: \n";
     $datos["vcantmaxpasajeros"] = trim(fgets(STDIN));
-    echo 'Ingrese Importe del Viaje: ';
+    echo "Ingrese Importe del Viaje: \n";
     $datos["vimporte"] = trim(fgets(STDIN));
-    echo 'Ingrese tipo de asiento: ';
+    echo "Seleccione tipo de asiento: \n1) Ejecutivo \n2) Estandard\n";
     $datos["tipoAsiento"] = trim(fgets(STDIN));
-    echo '¿Ida y vuelta?  S/N';
+    echo "1) Ida \n2) Ida y vuelta: \n";
     $datos["idayvuelta"] = trim(fgets(STDIN));
 
     return $datos;
@@ -168,23 +170,27 @@ function datosViaje()
 function datosPasajero()
 {
     $datosPasajero = [];
-    echo "Ingrese DNI: ";
+    echo "Ingrese DNI: \n";
     $datosPasajero["rdocumento"] = trim(fgets(STDIN));
-    echo "Ingrese Nombre: ";
+    echo "Ingrese Nombre: \n";
     $datosPasajero["pnombre"] = trim(fgets(STDIN));
-    echo "Ingrese Apellido: ";
+    echo "Ingrese Apellido: \n";
     $datosPasajero["papellido"] = trim(fgets(STDIN));
-    echo "Ingrese Teléfono: ";
+    echo "Ingrese Teléfono: \n";
     $datosPasajero["ptelefono"] = trim(fgets(STDIN));
 
     return $datosPasajero;
 }
 
+function separador($txt = "")
+{
+    $separador = "\n---------------" . $txt . "---------------\n";
+    return $separador;
+}
 /**************************************/
 /*********** PROGRAMA PRINCIPAL *******/
 /**************************************/
 
-$separador = "\n\n+++++++++++++++++++++++++++++++++\n";
 
 //Proceso:
 $empresa = new Empresa();
@@ -192,24 +198,21 @@ $responsable = new ResponsableV();
 $viaje = new Viaje();
 $pasajero = new Pasajero();
 echo "\nIniciando...\n";
-echo $separador;
-echo "Cargar Datos Empresa: \n";
+echo separador("Cargar Datos Empresa:");
 iniciarEmpresa($empresa);
-echo $separador;
-// inicio obj responsable
+echo separador("Responsable:");
 iniciarResponsable($responsable);
 
 do {
 
-    echo $separador;
-    echo "----------VIAJE----------\n";
+    echo "\n----------VIAJE----------\n";
     $opcion = menuInicial();
 
     switch ($opcion) {
         case 1:
-
+            echo separador("Cargar datos Viaje");
             $datos = datosViaje();
-            $viaje->cargar(null, $datos['vdestino'], $datos['vcantmaxpasajeros'], null, $empresa->getIdEmpresa(), $responsable->getRnumeroempleado(), $datos['vimporte'], $datos['tipoAsiento'], $datos['idayvuelta']);
+            $viaje->cargar(null, $datos['vdestino'], $datos['vcantmaxpasajeros'], null, $empresa, $responsable, $datos['vimporte'], $datos['tipoAsiento'], $datos['idayvuelta']);
 
             if ($viaje->insertar()) {
 
@@ -218,21 +221,24 @@ do {
 
                 $viaje->getMensajeOperacion();
             }
-
             break;
         case 2:
             //Modificar Viaje
+            echo separador();
             echo "Ingrese el ID del viaje a modificar: \n";
-            $idViaje = trim(fgetc(STDIN));
+            $idViaje = trim(fgets(STDIN));
             $viajeListado = $viaje->Buscar($idViaje);
-            echo $separador;
-            echo $viaje;
-            echo $separador;
 
             if ($viajeListado) {
 
                 $datos = datosViaje();
-                $viaje->cargar($idViaje, $datos['vdestino'], $datos['vcantmaxpasajeros'], null, $empresa->getIdEmpresa(), $responsable->getRnumeroempleado(), $datos['vimporte'], $datos['tipoAsiento'], $datos['idayvuelta']);
+                $viaje->cargar($idViaje, $datos['vdestino'], $datos['vcantmaxpasajeros'], null, $empresa, $responsable, $datos['vimporte'], $datos['tipoAsiento'], $datos['idayvuelta']);
+
+                if ($viaje->modificar($idViaje)) {
+                    echo "\n...Viaje Modificado...\n";
+                } else {
+                    echo $viaje->getMensajeOperacion();
+                }
             } else {
 
                 echo "El viaje ingresado no existe.\n";
@@ -244,13 +250,33 @@ do {
             echo "Ingrese el ID del viaje a Eliminar: \n";
             $idViaje = trim(fgets(STDIN));
             $viajeListado = $viaje->Buscar($idViaje);
-
+            //si existe
             if ($viajeListado) {
-                if ($viaje->eliminar()) {
+                //verificar si tiene pasajeros
+                $pasajeros = $pasajero->listar("idviaje = " . $viaje->getIdviaje());
+                if (!$pasajeros) {
+                    if ($viaje->eliminar()) {
 
-                    echo "Viaje eliminado...!! \n";
+                        echo "Viaje eliminado...!! \n";
+                    } else {
+                        echo $viaje->getMensajeOperacion();
+                    }
                 } else {
-                    echo $viaje->getMensajeOperacion();
+                    echo "El viaje posee asignados pasajeros. \n¿Desea eliminarlos del viaje antes? S/N\n";
+                    $resp = trim(fgets(STDIN));
+                    //si eliminar elimino
+                    if (strtoupper($resp) == "S") {
+                        for ($i = 0; $i < count($pasajeros); $i++) {
+                            $pasajeros[$i]->eliminar();
+                        }
+                        echo "Pasajeros eliminados\n";
+                        if ($viaje->eliminar()) {
+
+                            echo "Viaje eliminado...!! \n";
+                        } else {
+                            echo $viaje->getMensajeOperacion();
+                        }
+                    }
                 }
             } else {
                 echo "El viaje ingresado no existe. \n";
@@ -263,10 +289,20 @@ do {
             $viajeListado = $viaje->Buscar($idViaje);
 
             if ($viajeListado) {
-
-                echo $separador;
+                echo separador("Mostrar Viaje");
                 echo $viaje;
-                echo $separador;
+                $listaPasajeros = $pasajero->listar("idviaje = " . $viaje->getIdviaje());
+                if (!$listaPasajeros) {
+                    echo "...El viaje no posee pasajeros...";
+                } else {
+                    foreach ($listaPasajeros as $pasajero) {
+                        echo "----Pasajero----\n";
+                        echo "DNI: " . $pasajero->getRdocumento() . "\n";
+                        echo "Nombre: " . $pasajero->getPnombre() . "\n";
+                        echo "Apellido: " . $pasajero->getPapellido() . "\n";
+                        echo "Teléfono: " . $pasajero->getPtelefono() . "\n";
+                    }
+                }
             } else {
                 echo "El viaje ingresado no existe. \n";
             }
@@ -285,14 +321,24 @@ do {
 
                         if (!$existePasajero) {
 
-                            $pasajero->cargar($datos['rdocumento'], $datos['pnombre'], $datos['papellido'], $datos['ptelefono'], $viaje->getIdviaje());
+                            echo "Seleccione el viaje al que desea agregarlo. \n";
+                            $viajes = $viaje->listar();
+                            foreach ($viajes as $viaje) {
+                                echo "ID: " . $viaje->getIdViaje() . " - Destino: " . $viaje->getVdestino() . "\n";
+                            }
+                            $resp = trim(fgets(STDIN));
+                            if ($viaje->Buscar($resp)) {
+                                $pasajero->cargar($datos['rdocumento'], $datos['pnombre'], $datos['papellido'], $datos['ptelefono'], $viaje);
 
-                            if ($pasajero->insertar()) {
+                                if ($pasajero->insertar()) {
 
-                                echo "...Pasajero ingresado con éxito...\n";
+                                    echo "...Pasajero ingresado con éxito...\n";
+                                } else {
+
+                                    echo $pasajero->getMensajeoperacion();
+                                }
                             } else {
-
-                                echo $pasajero->getMensajeoperacion();
+                                echo "El viaje no existe";
                             }
                         } else {
                             echo "...El pasajero con ese DNI ya existe...\n";
@@ -301,17 +347,41 @@ do {
                         break;
                     case 2:
                         //solicito id del pasajero para buscarlo en la BD
-                        echo "Ingrese el ID del pasajero a modificar: \n";
-                        $idpasajero = trim(fgetc(STDIN));
+                        echo "Ingrese el DNI del pasajero a modificar: \n";
+                        $pasajeros = $pasajero->listar();
+                        foreach ($pasajeros as $pasajero) {
+
+                            echo separador();
+                            echo "DNI: " . $pasajero->getRdocumento() . " - Nombre Completo: " . $pasajero->getPapellido() . " " . $pasajero->getPnombre() . "\n";
+                            echo separador();
+                        }
+
+                        $idpasajero = trim(fgets(STDIN));
                         $pasajeroListado = $pasajero->Buscar($idpasajero);
-                        echo $separador;
-                        echo $pasajero;
-                        echo $separador;
                         //si existe solicito edicion del pasajero y lo envio a modificar en al BD
                         if ($pasajeroListado) {
 
                             $datos = datospasajero();
-                            $pasajero->cargar($idpasajero, $datos['vdestino'], $datos['vcantmaxpasajeros'], null, $empresa->getIdEmpresa(), $responsable->getRnumeroempleado(), $datos['vimporte'], $datos['tipoAsiento'], $datos['idayvuelta']);
+
+                            echo "Seleccione el ID del viaje al que desea agregarlo. \n";
+                            $viajes = $viaje->listar();
+                            foreach ($viajes as $viaje) {
+                                echo "ID: " . $viaje->getIdViaje() . " - Destino: " . $viaje->getVdestino() . "\n";
+                            }
+                            $resp = trim(fgets(STDIN));
+                            if ($viaje->Buscar($resp)) {
+                                $pasajero->cargar($datos['rdocumento'], $datos['pnombre'], $datos['papellido'], $datos['ptelefono'], $viaje);
+
+                                if ($pasajero->modificar($idpasajero)) {
+
+                                    echo "...Pasajero modificado con éxito...\n";
+                                } else {
+
+                                    echo $pasajero->getMensajeoperacion();
+                                }
+                            } else {
+                                echo "El viaje no existe";
+                            }
                         } else {
 
                             echo "El pasajero ingresado no existe.\n";
@@ -320,7 +390,7 @@ do {
                         break;
                     case 3:
 
-                        echo "Ingrese el ID del pasajero a Eliminar: \n";
+                        echo "Ingrese el DNI del pasajero a Eliminar: \n";
                         $idpasajero = trim(fgets(STDIN));
                         $pasajeroListado = $pasajero->Buscar($idpasajero);
 
@@ -337,15 +407,15 @@ do {
                         break;
                     case 4:
 
-                        echo "Ingrese el ID del pasajero a mostrar: \n";
+                        echo "Ingrese el DNI del pasajero a mostrar: \n";
                         $idpasajero = trim(fgets(STDIN));
                         $pasajeroListado = $pasajero->Buscar($idpasajero);
 
                         if ($pasajeroListado) {
 
-                            echo $separador;
+                            echo separador();
                             echo $pasajero;
-                            echo $separador;
+                            echo separador();
                         } else {
                             echo "El pasajero ingresado no existe. \n";
                         }
@@ -355,9 +425,7 @@ do {
                         echo "Regresando al menú anterior...\n";
                         break;
                 }
-            } while ($opcionPasajero != 4);
+            } while ($opcionPasajero != 5);
             break;
     }
-
-    break;
-} while ($opcion != 5);
+} while ($opcion != 6);

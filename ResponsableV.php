@@ -173,10 +173,10 @@ class ResponsableV
 
     public function __toString()
     {
-        $string = "Número de Empleado: " . $this->getRnumeroempleado() . "\n";
-        $string .= "Número de Licencia: " . $this->getRnumerolicencia() . "\n";
-        $string .= "Nombre Responsable: " . $this->getRnombre() . "\n";
-        $string .= "Apellido Responsable: " . $this->getRapellido() . "\n";
+        $string = " Número de Empleado: " . $this->getRnumeroempleado() . "\n";
+        $string .= " Número de Licencia: " . $this->getRnumerolicencia() . "\n";
+        $string .= " Nombre Responsable: " . $this->getRnombre() . "\n";
+        $string .= " Apellido Responsable: " . $this->getRapellido() . "\n";
 
         return $string;
     }
