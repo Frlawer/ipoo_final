@@ -82,12 +82,17 @@ class Viaje
                 $arregloViaje = array();
                 while ($row2 = $base->Registro()) {
 
+                    $empresa = new Empresa();
+                    $empresa->Buscar($row2['idempresa']);
+                    $responsable = new ResponsableV();
+                    $responsable->Buscar($row2['rnumeroempleado']);
+
                     $idviaje = $row2['idviaje'];
                     $vdestino = $row2['vdestino'];
                     $vcantmaxpasajeros = $row2['vcantmaxpasajeros'];
                     $rdocumento = $row2['rdocumento'];
-                    $idempresa = $row2['idempresa'];
-                    $rnumeroempleado = $row2['rnumeroempleado'];
+                    $idempresa = $empresa;
+                    $rnumeroempleado = $responsable;
                     $vimporte = $row2['vimporte'];
                     $tipoAsiento = $row2['tipoAsiento'];
                     $idayvuelta = $row2['idayvuelta'];

@@ -88,7 +88,6 @@ function iniciarResponsable($responsable)
     echo "1) Seleccionar responsable.\n";
     echo "2) Ingresar responsable.\n";
 
-
     $opcion = solicitarNumero(1, 2);
 
     //si opcion 1 

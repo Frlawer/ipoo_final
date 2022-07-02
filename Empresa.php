@@ -60,9 +60,9 @@ class Empresa
                     $ENombre = $row2['enombre'];
                     $EDireccion = $row2['edireccion'];
 
-                    $pasajero = new Empresa();
-                    $pasajero->cargar($idEmpresa, $ENombre, $EDireccion);
-                    array_push($arregloEmpresa, $pasajero);
+                    $empresa = new Empresa();
+                    $empresa->cargar($idEmpresa, $ENombre, $EDireccion);
+                    array_push($arregloEmpresa, $empresa);
                 }
             } else {
                 $this->setMensajeoperacion($base->getError());
